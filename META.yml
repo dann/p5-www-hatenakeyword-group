@@ -1,0 +1,24 @@
+---
+abstract: 'CRUD interface for Hatena::Keyword '
+author:
+  - 'Dann <techmemo@gmail.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.72'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: WWW-HatenaKeyword-Group
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  JSON::Syck: 0
+  Moose: 0
+  MooseX::Method: 0
+  WWW::HatenaLogin: 0
+  Web::Scraper: 0
+version: 0.01
