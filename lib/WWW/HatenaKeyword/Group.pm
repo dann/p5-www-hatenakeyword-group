@@ -3,6 +3,10 @@ use MooseX::Method;
 use Moose;
 use WWW::HatenaLogin;
 use Web::Scraper;
+use DateTime;
+use DateTime::TimeZone;
+use DateTime::Format::Strptime;
+use URI::Escape;
 use JSON::Syck 'Load';
 
 our $VERSION = '0.01';
@@ -84,7 +88,33 @@ method update => named(
     body    => { isa => 'Str', required => 1 },
 ) => sub {
     my ( $self, $args ) = @_;
-    $self->_post_keyword(%$args);
+    my $uri = $self->base . "keyword";
+    $self->session->mech->post(
+        $uri,
+        {   rkm        => $self->rkm,
+            word       => $args->{keyword},
+            body       => $args->{body},
+            edit       => 'edit',
+            mode       => 'enter',
+            timestamp  => $self->current_timestamp,
+            olddelflag => 0,
+        }
+    );
+
+};
+
+method current_timestamp => named(
+) => sub {
+    my ( $self, $args ) = @_;
+
+    my $tzhere = DateTime::TimeZone->new( name => 'local' );
+    my $dt = DateTime->now(time_zone => $tzhere);
+    my $format = DateTime::Format::Strptime->new(
+         pattern => '%Y%m%d%H%M%S',
+         on_error => 'undef',
+    );  
+    my $current_timestamp = $format->format_datetime($dt);
+    return $current_timestamp;
 };
 
 method list_keywords => named( 
@@ -149,7 +179,7 @@ method keyword_url => named(
 ) => sub {
     my ( $self, $args ) = @_;
 
-    my $url = $self->base . "keyword/" . $args->{keyword};
+    my $url = $self->base . "keyword/" . uri_escape_utf8($args->{keyword});
     $url;
 };
 

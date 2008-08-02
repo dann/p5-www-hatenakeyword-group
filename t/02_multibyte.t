@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use WWW::HatenaKeyword::Group;
+use utf8;
+use Encode;
 
 my $username = $ENV{WWW_HATENADIARY_TEST_USERNAME};
 my $password = $ENV{WWW_HATENADIARY_TEST_PASSWORD};
@@ -20,20 +22,23 @@ my $api = WWW::HatenaKeyword::Group->new(
     group    => $group,
 );
 
-my $keyword_name = 'Keyword name';
-my $keyword_body = 'Moooooooooooooose';
+my $keyword_name = '日本語テストキーワード';
+my $keyword_body = 'ムース';
+
 {
     $api->create( keyword => $keyword_name, body => $keyword_body );
     my $keyword = $api->retrieve( keyword => $keyword_name );
-    is( $keyword->{body}, $keyword_body, 'Creates a new keyword' );
+    is( Encode::decode_utf8( $keyword->{body} ),
+        $keyword_body, 'Creates a new keyword' );
 }
 
 TODO: {
-    local $TODO = 'bug...';
-    $keyword_body = 'updated';
+    local $TODO = "bug ...";
+    $keyword_body = 'アップデート';
     $api->update( keyword => $keyword_name, body => $keyword_body );
     my $keyword = $api->retrieve( keyword => $keyword_name );
-    is( $keyword->{body}, $keyword_body, 'updated a new keyword' );
+    is( Encode::decode_utf8( $keyword->{body} ),
+        $keyword_body, 'updated a new keyword' );
 }
 
 {
@@ -41,4 +46,3 @@ TODO: {
     my $keyword = $api->retrieve( keyword => $keyword_name );
     ok( !$keyword->{body}, 'Delete a keyword' );
 }
-
